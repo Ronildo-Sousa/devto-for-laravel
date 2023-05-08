@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -10,11 +10,20 @@ use RonildoSousa\DevtoForLaravel\Entities\Article;
 
 class Articles extends BaseEndpoint
 {
+    private string $from = "";
+
     private int $per_page = 30;
 
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function from(string $name): static
+    {
+        $this->from = $name;
+
+        return $this;
+    }
 
     public function withoutTags(array $tags): static
     {
@@ -56,6 +65,7 @@ class Articles extends BaseEndpoint
             'per_page'     => $this->per_page,
             'tags'         => $this->tags_include,
             'tags_exclude' => $this->tags_exclude,
+            'username'     => $this->from,
         ];
 
         foreach ($properties as $key => $value) {

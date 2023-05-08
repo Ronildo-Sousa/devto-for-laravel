@@ -16,6 +16,8 @@ class Article
 
     public string $tags;
 
+    public array $user;
+
     public function __construct(array $data)
     {
         $this->id          = data_get($data, 'id');
@@ -23,5 +25,6 @@ class Article
         $this->description = data_get($data, 'description');
         $this->slug        = data_get($data, 'slug');
         $this->tags        = data_get($data, 'tags');
+        $this->user        = data_get($data, 'user');
     }
 }

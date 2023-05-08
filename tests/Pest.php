@@ -20,5 +20,6 @@ function articleFakeRequest(bool $single = false)
         '/articles?per_page=2'  => Http::response([$data[0], $data[1]]),
         '*&tags=discuss'        => Http::response([$data[0], $data[2]]),
         '&tags_exclude=discuss' => Http::response([$data[1]]),
+        '&username=ben'         => Http::response([$data[1], $data[2]]),
     ]);
 }
