@@ -14,7 +14,6 @@ beforeEach(function () {
 });
 
 it('should get a feed article list', function () {
-
     $articles = DevtoForLaravel::articles()
         ->get();
     $first = $articles->first();
@@ -29,4 +28,17 @@ it('should get a feed article list', function () {
         ->toBe('The Line of Beauty172')
         ->and($first->slug)
         ->toBe('the-line-of-beauty172-39d8');
+});
+
+it('should be able to set items per page', function () {
+    $articles = DevtoForLaravel::articles()
+        ->perPage(2)
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles->count())
+        ->toBe(2)
+        ->and($articles->first())
+        ->toBeInstanceOf(Article::class);
 });

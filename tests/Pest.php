@@ -16,6 +16,7 @@ function articleFakeRequest(bool $single = false)
     }
 
     Http::fake([
-        '/articles' => Http::response($data),
+        '/articles'            => Http::response($data),
+        '/articles?per_page=*' => Http::response([$data[0], $data[1]]),
     ]);
 }
