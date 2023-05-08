@@ -72,3 +72,17 @@ it('should be able to get items without requested tags', function () {
             $article->tags->not->toContain('discuss');
         });
 });
+
+it('should be able to get articles from a given user', function () {
+    $articles = DevtoForLaravel::articles()
+        ->from('ben')
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles)
+        ->each(function ($article) {
+            $article->toBeInstanceOf(Article::class);
+            $article->user->toContain('ben');
+        });
+});
