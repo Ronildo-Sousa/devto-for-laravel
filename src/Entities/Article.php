@@ -14,11 +14,14 @@ class Article
 
     public string $slug;
 
+    public string $tags;
+
     public function __construct(array $data)
     {
         $this->id          = data_get($data, 'id');
         $this->title       = data_get($data, 'title');
         $this->description = data_get($data, 'description');
         $this->slug        = data_get($data, 'slug');
+        $this->tags        = data_get($data, 'tags');
     }
 }

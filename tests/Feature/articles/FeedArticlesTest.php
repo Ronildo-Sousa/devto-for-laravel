@@ -20,7 +20,8 @@ it('should get a feed article list', function () {
 
     expect($articles)
         ->toBeInstanceOf(Collection::class)
-        ->and($first)
+        ->and($articles)
+        ->each
         ->toBeInstanceOf(Article::class)
         ->and($first->id)
         ->toBe(1544)
@@ -39,6 +40,21 @@ it('should be able to set items per page', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles->count())
         ->toBe(2)
-        ->and($articles->first())
+        ->and($articles)
+        ->each
         ->toBeInstanceOf(Article::class);
+});
+
+it('should be able to get items with requested tags', function () {
+    $articles = DevtoForLaravel::articles()
+        ->withTags(['discuss'])
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles)
+        ->each(function ($article) {
+            $article->toBeInstanceOf(Article::class);
+            $article->tags->toContain('discuss');
+        });
 });

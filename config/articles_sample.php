@@ -81,7 +81,7 @@ return [
             "watercooler",
             "jokes",
         ],
-        "tags" => "discuss, watercooler, jokes",
+        "tags" => "career, beginners, job, bestofdev",
         "user" => [
             "name"             => "Ben Halpern",
             "username"         => "ben",

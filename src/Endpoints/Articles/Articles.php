@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -10,7 +10,18 @@ use RonildoSousa\DevtoForLaravel\Entities\Article;
 
 class Articles extends BaseEndpoint
 {
-    public int $per_page = 30;
+    private int $per_page = 30;
+
+    private array $tags_include = [];
+
+    private array $tags_exclude = [];
+
+    public function withTags(array $tags): static
+    {
+        $this->tags_include = $tags;
+
+        return $this;
+    }
 
     public function perPage(int $per_page): static
     {
@@ -22,8 +33,9 @@ class Articles extends BaseEndpoint
     public function get(): Collection
     {
         $uri = sprintf(
-            '/articles?per_page=%d',
-            $this->per_page
+            '/articles?per_page=%d&tags=%s',
+            $this->per_page,
+            implode(',', $this->tags_include)
         );
 
         $articles = $this->service
