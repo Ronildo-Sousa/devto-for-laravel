@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types = 1);
 
-namespace VendorName\Skeleton\Commands;
+namespace RonildoSousa\DevtoForLaravel\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class DevtoForLaravelCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'devto-for-laravel';
 
     public $description = 'My command';
 
