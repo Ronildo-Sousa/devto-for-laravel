@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints;
 
 use Illuminate\Support\Collection;
 use RonildoSousa\DevtoForLaravel\DevtoForLaravel;
-use RonildoSousa\DevtoForLaravel\Entities\Article;
 
 class BaseEndpoint
 {
