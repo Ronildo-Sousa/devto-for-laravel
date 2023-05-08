@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -15,6 +15,13 @@ class Articles extends BaseEndpoint
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function withoutTags(array $tags): static
+    {
+        $this->tags_exclude = $tags;
+
+        return $this;
+    }
 
     public function withTags(array $tags): static
     {
@@ -32,17 +39,38 @@ class Articles extends BaseEndpoint
 
     public function get(): Collection
     {
-        $uri = sprintf(
-            '/articles?per_page=%d&tags=%s',
-            $this->per_page,
-            implode(',', $this->tags_include)
-        );
-
         $articles = $this->service
             ->api
-            ->get($uri)
+            ->get($this->makeUri('/articles'))
             ->collect();
 
         return $this->transform($articles, Article::class);
+    }
+
+    private function makeUri(string $prefix = ''): string
+    {
+        $uri = "{$prefix}?";
+        $i   = 0;
+
+        $properties = [
+            'per_page'     => $this->per_page,
+            'tags'         => $this->tags_include,
+            'tags_exclude' => $this->tags_exclude,
+        ];
+
+        foreach ($properties as $key => $value) {
+            if (empty($value) || $value == "") {
+                continue;
+            }
+
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
+            $uri .= (($i !== 0) ? '&' : '') . "{$key}={$value}";
+
+            $i++;
+        }
+
+        return $uri;
     }
 }
