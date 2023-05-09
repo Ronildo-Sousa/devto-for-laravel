@@ -12,11 +12,20 @@ class Articles extends BaseEndpoint
 {
     private string $from = "";
 
+    private ?int $page = null;
+
     private int $per_page = 30;
 
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function fromPage(int $page): static
+    {
+        $this->page = $page;
+
+        return $this;
+    }
 
     public function from(string $name): static
     {
@@ -66,6 +75,7 @@ class Articles extends BaseEndpoint
             'tags'         => $this->tags_include,
             'tags_exclude' => $this->tags_exclude,
             'username'     => $this->from,
+            'page'         => $this->page,
         ];
 
         foreach ($properties as $key => $value) {

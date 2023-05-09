@@ -86,3 +86,15 @@ it('should be able to get articles from a given user', function () {
             $article->user->toContain('ben');
         });
 });
+
+it('should be able to choose a page result', function () {
+    $articles = DevtoForLaravel::articles()
+        ->fromPage(2)
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles)
+        ->each
+        ->toBeInstanceOf(Article::class);
+});
