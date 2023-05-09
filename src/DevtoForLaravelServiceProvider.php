@@ -18,7 +18,7 @@ class DevtoForLaravelServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('devto-for-laravel')
-            ->hasConfigFile(['devto-for-laravel', 'articles_sample'])
+            ->hasConfigFile(['devto-for-laravel', 'articles_sample', 'single_article_sample'])
             ->hasViews()
             ->hasMigration('create_devto-for-laravel_table')
             ->hasCommand(DevtoForLaravelCommand::class);

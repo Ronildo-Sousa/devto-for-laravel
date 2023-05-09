@@ -86,3 +86,51 @@ it('should be able to get articles from a given user', function () {
             $article->user->toContain('ben');
         });
 });
+
+it('should be able to choose a page result', function () {
+    $articles = DevtoForLaravel::articles()
+        ->fromPage(2)
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles)
+        ->each
+        ->toBeInstanceOf(Article::class);
+});
+
+it('should be able to get latest articles', function () {
+    $articles = DevtoForLaravel::articles()
+        ->latest()
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles)
+        ->each
+        ->toBeInstanceOf(Article::class);
+});
+
+it('should be able to get an article by id', function () {
+    $article = DevtoForLaravel::articles()
+        ->find(258);
+
+    expect($article)
+        ->toBeInstanceOf(Article::class)
+        ->and($article->id)
+        ->toBe(258)
+        ->and($article->title)
+        ->toBe('Pale Kings and Princes179')
+        ->and($article->slug)
+        ->toBe('pale-kings-and-princes179-381c');
+});
+
+it('should get an error passging an invalid id', function () {
+    $response = DevtoForLaravel::articles()
+        ->find(0);
+
+    expect($response->get('status'))
+        ->toBe(404)
+        ->and($response->get('error'))
+        ->toBe('not found');
+});
