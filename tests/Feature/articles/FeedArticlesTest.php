@@ -124,3 +124,13 @@ it('should be able to get an article by id', function () {
         ->and($article->slug)
         ->toBe('pale-kings-and-princes179-381c');
 });
+
+it('should get an error passging an invalid id', function () {
+    $response = DevtoForLaravel::articles()
+        ->find(0);
+
+    expect($response->get('status'))
+        ->toBe(404)
+        ->and($response->get('error'))
+        ->toBe('not found');
+});

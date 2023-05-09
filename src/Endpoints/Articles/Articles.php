@@ -1,12 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
 use Illuminate\Support\Collection;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
 use RonildoSousa\DevtoForLaravel\Entities\Article;
+use Symfony\Component\HttpFoundation\Response;
 
 class Articles extends BaseEndpoint
 {
@@ -64,12 +65,18 @@ class Articles extends BaseEndpoint
         return $this;
     }
 
-    public function find(int $id): Article
+    public function find(int $id): Article|Collection
     {
         $response = $this->service
             ->api
-            ->get("/articles/{$id}")
-            ->collect();
+            ->get("/articles/{$id}");
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
 
         return new Article($response->toArray());
     }
