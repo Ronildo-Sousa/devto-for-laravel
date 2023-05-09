@@ -110,3 +110,17 @@ it('should be able to get latest articles', function () {
         ->each
         ->toBeInstanceOf(Article::class);
 });
+
+it('should be able to get an article by id', function () {
+    $article = DevtoForLaravel::articles()
+        ->find(258);
+
+    expect($article)
+        ->toBeInstanceOf(Article::class)
+        ->and($article->id)
+        ->toBe(258)
+        ->and($article->title)
+        ->toBe('Pale Kings and Princes179')
+        ->and($article->slug)
+        ->toBe('pale-kings-and-princes179-381c');
+});

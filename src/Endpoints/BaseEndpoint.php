@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints;
 
@@ -16,9 +16,8 @@ class BaseEndpoint
         $this->service = new DevtoForLaravel();
     }
 
-    protected function transform(mixed $data, string $entity): Collection
+    protected function transform(Collection $data, string $entity): Collection
     {
-        return collect($data)
-            ->map(fn ($item) => new $entity($item));
+        return $data->map(fn ($item) => new $entity($item));
     }
 }

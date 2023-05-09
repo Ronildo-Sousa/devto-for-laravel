@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -62,6 +62,16 @@ class Articles extends BaseEndpoint
         $this->per_page = $per_page;
 
         return $this;
+    }
+
+    public function find(int $id): Article
+    {
+        $response = $this->service
+            ->api
+            ->get("/articles/{$id}")
+            ->collect();
+
+        return new Article($response->toArray());
     }
 
     public function get(): Collection
