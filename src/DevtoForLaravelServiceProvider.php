@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel;
 
@@ -16,7 +18,7 @@ class DevtoForLaravelServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('devto-for-laravel')
-            ->hasConfigFile()
+            ->hasConfigFile(['devto-for-laravel', 'articles_sample'])
             ->hasViews()
             ->hasMigration('create_devto-for-laravel_table')
             ->hasCommand(DevtoForLaravelCommand::class);
