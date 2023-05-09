@@ -20,11 +20,17 @@ class Article
 
     public function __construct(array $data)
     {
-        $this->id          = data_get($data, 'id');
-        $this->title       = data_get($data, 'title');
+        $this->id = data_get($data, 'id');
+
+        $this->title = data_get($data, 'title');
+
         $this->description = data_get($data, 'description');
-        $this->slug        = data_get($data, 'slug');
-        $this->tags        = data_get($data, 'tags');
-        $this->user        = data_get($data, 'user');
+
+        $this->slug = data_get($data, 'slug');
+
+        $tags       = data_get($data, 'tags');
+        $this->tags = is_array($tags) ? implode(', ', $tags) : $tags;
+
+        $this->user = data_get($data, 'user');
     }
 }
