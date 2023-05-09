@@ -98,3 +98,15 @@ it('should be able to choose a page result', function () {
         ->each
         ->toBeInstanceOf(Article::class);
 });
+
+it('should be able to get latest articles', function () {
+    $articles = DevtoForLaravel::articles()
+        ->latest()
+        ->get();
+
+    expect($articles)
+        ->toBeInstanceOf(Collection::class)
+        ->and($articles)
+        ->each
+        ->toBeInstanceOf(Article::class);
+});

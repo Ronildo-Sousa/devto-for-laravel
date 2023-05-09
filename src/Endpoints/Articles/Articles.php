@@ -14,11 +14,20 @@ class Articles extends BaseEndpoint
 
     private ?int $page = null;
 
+    private bool $return_latest = false;
+
     private int $per_page = 30;
 
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function latest(): static
+    {
+        $this->return_latest = true;
+
+        return $this;
+    }
 
     public function fromPage(int $page): static
     {
@@ -57,9 +66,12 @@ class Articles extends BaseEndpoint
 
     public function get(): Collection
     {
+        $getLatest = ($this->return_latest) ? '/latest' : '';
+
+        $uri      = $this->makeUri("/articles{$getLatest}");
         $articles = $this->service
             ->api
-            ->get($this->makeUri('/articles'))
+            ->get($uri)
             ->collect();
 
         return $this->transform($articles, Article::class);
