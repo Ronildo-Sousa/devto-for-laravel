@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -92,7 +92,7 @@ class Articles extends BaseEndpoint
         return $this;
     }
 
-    public function update(int $id, array $payload)
+    public function update(int $id, array $payload): Article|Collection
     {
         $response = $this->service
             ->api

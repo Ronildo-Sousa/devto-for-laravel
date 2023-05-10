@@ -32,10 +32,14 @@ function articleFakeRequest($without_api_key = false)
                 : Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
         },
 
-        '/articles/258' => function ($request) use ($singleArticle) {
-            return ($request->method() == 'PUT')
-                ? Http::response($singleArticle[1])
-                : Http::response($singleArticle[0]);
+        '/articles/258' => function ($request) use ($singleArticle, $without_api_key) {
+            if ((!empty($request->headers()['api-key'][0]) && !$without_api_key)) {
+                return ($request->method() == 'PUT')
+                    ? Http::response($singleArticle[1])
+                    : Http::response($singleArticle[0]);
+            }
+
+            return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
         },
 
         '/articles/0' => Http::response(['error' => 'not found', 'status' => 404], Response::HTTP_NOT_FOUND),

@@ -29,3 +29,19 @@ it('should be able to update an user article', function () {
         ->and($response->body_markdown)
         ->toBe('my updated body_markdown');
 });
+
+it('should not be able to update without api-key', function () {
+    articleFakeRequest(true);
+
+    $response = DevtoForLaravel::articles()
+        ->update(258, [
+            'title'         => 'my updated title',
+            'description'   => 'my updated description',
+            'body_markdown' => 'my updated body markdown',
+        ]);
+
+    expect($response->get('status'))
+        ->toBe(401)
+        ->and($response->get('error'))
+        ->toBe('unauthorized');
+});
