@@ -16,7 +16,11 @@ class Article
 
     public readonly string $published_timestamp;
 
-    public readonly string $tags;
+    public readonly ?string $body_markdown;
+
+    public readonly ?string $body_html;
+
+    public readonly ?string $tags;
 
     public readonly array $user;
 
@@ -31,6 +35,10 @@ class Article
         $this->slug = data_get($data, 'slug');
 
         $this->published_timestamp = data_get($data, 'published_timestamp');
+
+        $this->body_html = data_get($data, 'body_html');
+
+        $this->body_markdown = data_get($data, 'body_markdown');
 
         $tags       = data_get($data, 'tags');
         $this->tags = is_array($tags) ? implode(', ', $tags) : $tags;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -90,6 +90,22 @@ class Articles extends BaseEndpoint
         $this->per_page = $per_page;
 
         return $this;
+    }
+
+    public function update(int $id, array $payload)
+    {
+        $response = $this->service
+            ->api
+            ->put("/articles/{$id}", ['article' => $payload]);
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
+
+        return new Article($response->toArray());
     }
 
     public function find(int $id): Article|Collection

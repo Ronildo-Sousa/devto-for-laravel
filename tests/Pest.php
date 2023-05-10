@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 use Illuminate\Support\Facades\Http;
 use RonildoSousa\DevtoForLaravel\Tests\TestCase;
@@ -32,7 +32,11 @@ function articleFakeRequest($without_api_key = false)
                 : Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
         },
 
-        '/articles/258' => Http::response($singleArticle),
+        '/articles/258' => function ($request) use ($singleArticle) {
+            return ($request->method() == 'PUT')
+                ? Http::response($singleArticle[1])
+                : Http::response($singleArticle[0]);
+        },
 
         '/articles/0' => Http::response(['error' => 'not found', 'status' => 404], Response::HTTP_NOT_FOUND),
 
