@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -59,4 +59,20 @@ it('should be able to get only published articles', function () {
         ->toBeInstanceOf(Article::class)
         ->and($response)
         ->each(fn ($item) => $item->published_timestamp->not->toBeNull());
+});
+
+it('should be able to get only unpublished articles', function () {
+    articleFakeRequest();
+
+    $response = DevtoForLaravel::articles()
+        ->me()
+        ->unpublished()
+        ->get();
+
+    expect($response)
+        ->toBeInstanceOf(Collection::class)
+        ->each
+        ->toBeInstanceOf(Article::class)
+        ->and($response)
+        ->each(fn ($item) => $item->published_timestamp->toBe(''));
 });

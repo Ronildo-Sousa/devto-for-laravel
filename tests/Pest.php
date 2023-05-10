@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use RonildoSousa\DevtoForLaravel\Tests\TestCase;
@@ -14,6 +14,12 @@ function articleFakeRequest($without_api_key = false)
     $singleArticle    = config('single_article_sample');
 
     Http::fake([
+        '/articles/me/unpublished?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
+            return (!empty($request->headers()['api-key'][0]) && !$without_api_key)
+                ? Http::response([$multipleArticles[2]])
+                : Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+        },
+
         '/articles/me/published?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
             return (!empty($request->headers()['api-key'][0]) && !$without_api_key)
                 ? Http::response([$multipleArticles[0], $multipleArticles[1]])

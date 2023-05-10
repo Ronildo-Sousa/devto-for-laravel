@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -21,6 +21,8 @@ class Articles extends BaseEndpoint
 
     private string $return_published = '';
 
+    private string $return_unpublished = '';
+
     private int $per_page = 30;
 
     private array $tags_include = [];
@@ -30,6 +32,13 @@ class Articles extends BaseEndpoint
     public function published(): static
     {
         $this->return_published = '/published';
+
+        return $this;
+    }
+
+    public function unpublished(): static
+    {
+        $this->return_unpublished = '/unpublished';
 
         return $this;
     }
@@ -126,6 +135,10 @@ class Articles extends BaseEndpoint
         if ($this->return_me) {
             if ($this->return_published) {
                 return $this->return_me . $this->return_published;
+            }
+
+            if ($this->return_unpublished) {
+                return $this->return_me . $this->return_unpublished;
             }
 
             return $this->return_me . '/all';
