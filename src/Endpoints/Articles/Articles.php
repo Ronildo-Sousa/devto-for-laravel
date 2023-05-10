@@ -17,11 +17,24 @@ class Articles extends BaseEndpoint
 
     private bool $return_latest = false;
 
+    private bool $return_me = false;
+
+    private bool $return_published = false;
+
+    private bool $return_unpublished = false;
+
     private int $per_page = 30;
 
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function me(): static
+    {
+        $this->return_me = true;
+
+        return $this;
+    }
 
     public function latest(): static
     {
@@ -85,13 +98,24 @@ class Articles extends BaseEndpoint
     {
         $getLatest = ($this->return_latest) ? '/latest' : '';
 
-        $uri      = $this->makeUri("/articles{$getLatest}");
-        $articles = $this->service
-            ->api
-            ->get($uri)
-            ->collect();
+        $getPublished   = ($this->return_published) ? '/published' : null;
+        $getUnpublished = ($this->return_unpublished) ? '/unpublished' : null;
+        $getMe          = ($this->return_me) ? '/me/all' . ($getPublished ? $getPublished : $getUnpublished) : '';
 
-        return $this->transform($articles, Article::class);
+        $uri = $this->makeUri("/articles{$getLatest}{$getMe}");
+
+        $response = $this->service
+            ->api
+            ->get($uri);
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
+
+        return $this->transform($response, Article::class);
     }
 
     private function makeUri(string $prefix = ''): string
