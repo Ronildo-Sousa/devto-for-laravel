@@ -44,3 +44,19 @@ it('should get an error without an api-key', function () {
         ->and($response->get('error'))
         ->toBe('unauthorized');
 });
+
+it('should be able to get only published articles', function () {
+    articleFakeRequest();
+
+    $response = DevtoForLaravel::articles()
+        ->me()
+        ->published()
+        ->get();
+
+    expect($response)
+        ->toBeInstanceOf(Collection::class)
+        ->each
+        ->toBeInstanceOf(Article::class)
+        ->and($response)
+        ->each(fn ($item) => $item->published_timestamp->not->toBeNull());
+});

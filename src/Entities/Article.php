@@ -6,17 +6,19 @@ namespace RonildoSousa\DevtoForLaravel\Entities;
 
 class Article
 {
-    public int $id;
+    public readonly int $id;
 
-    public string $title;
+    public readonly string $title;
 
-    public string $description;
+    public readonly string $description;
 
-    public string $slug;
+    public readonly string $slug;
 
-    public string $tags;
+    public readonly string $published_timestamp;
 
-    public array $user;
+    public readonly string $tags;
+
+    public readonly array $user;
 
     public function __construct(array $data)
     {
@@ -27,6 +29,8 @@ class Article
         $this->description = data_get($data, 'description');
 
         $this->slug = data_get($data, 'slug');
+
+        $this->published_timestamp = data_get($data, 'published_timestamp');
 
         $tags       = data_get($data, 'tags');
         $this->tags = is_array($tags) ? implode(', ', $tags) : $tags;

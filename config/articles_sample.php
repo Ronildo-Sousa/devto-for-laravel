@@ -110,7 +110,7 @@ return [
         "comments_count"           => 8,
         "public_reactions_count"   => 4,
         "collection_id"            => 22092,
-        "published_timestamp"      => "2023-05-08T07:00:00Z",
+        "published_timestamp"      => "",
         "positive_reactions_count" => 4,
         "cover_image"              => "https://res.cloudinary.com/practicaldev/image/fetch/s--7H4_sCeW--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/8jab2sbu3ilbw9clsjqq.png",
         "social_image"             => "https://res.cloudinary.com/practicaldev/image/fetch/s--whj-j0pR--/c_imagga_scale,f_auto,fl_progressive,h_500,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/8jab2sbu3ilbw9clsjqq.png",

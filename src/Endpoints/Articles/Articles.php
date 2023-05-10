@@ -17,11 +17,9 @@ class Articles extends BaseEndpoint
 
     private bool $return_latest = false;
 
-    private bool $return_me = false;
+    private string $return_me = '';
 
-    private bool $return_published = false;
-
-    private bool $return_unpublished = false;
+    private string $return_published = '';
 
     private int $per_page = 30;
 
@@ -29,9 +27,16 @@ class Articles extends BaseEndpoint
 
     private array $tags_exclude = [];
 
+    public function published(): static
+    {
+        $this->return_published = '/published';
+
+        return $this;
+    }
+
     public function me(): static
     {
-        $this->return_me = true;
+        $this->return_me = '/me';
 
         return $this;
     }
@@ -98,9 +103,7 @@ class Articles extends BaseEndpoint
     {
         $getLatest = ($this->return_latest) ? '/latest' : '';
 
-        $getPublished   = ($this->return_published) ? '/published' : null;
-        $getUnpublished = ($this->return_unpublished) ? '/unpublished' : null;
-        $getMe          = ($this->return_me) ? '/me/all' . ($getPublished ? $getPublished : $getUnpublished) : '';
+        $getMe = $this->getMeUri();
 
         $uri = $this->makeUri("/articles{$getLatest}{$getMe}");
 
@@ -116,6 +119,19 @@ class Articles extends BaseEndpoint
         }
 
         return $this->transform($response, Article::class);
+    }
+
+    private function getMeUri(): ?string
+    {
+        if ($this->return_me) {
+            if ($this->return_published) {
+                return $this->return_me . $this->return_published;
+            }
+
+            return $this->return_me . '/all';
+        }
+
+        return null;
     }
 
     private function makeUri(string $prefix = ''): string
