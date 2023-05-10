@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -17,11 +17,38 @@ class Articles extends BaseEndpoint
 
     private bool $return_latest = false;
 
+    private string $return_me = '';
+
+    private string $return_published = '';
+
+    private string $return_unpublished = '';
+
     private int $per_page = 30;
 
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function published(): static
+    {
+        $this->return_published = '/published';
+
+        return $this;
+    }
+
+    public function unpublished(): static
+    {
+        $this->return_unpublished = '/unpublished';
+
+        return $this;
+    }
+
+    public function me(): static
+    {
+        $this->return_me = '/me';
+
+        return $this;
+    }
 
     public function latest(): static
     {
@@ -65,6 +92,22 @@ class Articles extends BaseEndpoint
         return $this;
     }
 
+    public function update(int $id, array $payload): Article|Collection
+    {
+        $response = $this->service
+            ->api
+            ->put("/articles/{$id}", ['article' => $payload]);
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
+
+        return new Article($response->toArray());
+    }
+
     public function find(int $id): Article|Collection
     {
         $response = $this->service
@@ -85,13 +128,39 @@ class Articles extends BaseEndpoint
     {
         $getLatest = ($this->return_latest) ? '/latest' : '';
 
-        $uri      = $this->makeUri("/articles{$getLatest}");
-        $articles = $this->service
-            ->api
-            ->get($uri)
-            ->collect();
+        $getMe = $this->getMeUri();
 
-        return $this->transform($articles, Article::class);
+        $uri = $this->makeUri("/articles{$getLatest}{$getMe}");
+
+        $response = $this->service
+            ->api
+            ->get($uri);
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
+
+        return $this->transform($response, Article::class);
+    }
+
+    private function getMeUri(): ?string
+    {
+        if ($this->return_me) {
+            if ($this->return_published) {
+                return $this->return_me . $this->return_published;
+            }
+
+            if ($this->return_unpublished) {
+                return $this->return_me . $this->return_unpublished;
+            }
+
+            return $this->return_me . '/all';
+        }
+
+        return null;
     }
 
     private function makeUri(string $prefix = ''): string
