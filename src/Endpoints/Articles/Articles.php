@@ -29,6 +29,35 @@ class Articles extends BaseEndpoint
 
     private array $tags_exclude = [];
 
+    public function create(array $payload): Article|Collection
+    {
+        $response = $this->service
+            ->api->post('/articles', ['article' => $payload]);
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
+
+        return new Article($response->toArray());
+    }
+
+    public function publish(int $id): Article|Collection
+    {
+        return $this->update($id, [
+            'published'          => true,
+        ]);
+    }
+
+    public function unpublish(int $id): Article|Collection
+    {
+        return $this->update($id, [
+            'published'          => false,
+        ]);
+    }
+
     public function published(): static
     {
         $this->return_published = '/published';
