@@ -14,7 +14,11 @@ class Article
 
     public readonly string $slug;
 
-    public readonly string $published_timestamp;
+    public readonly ?string $readable_publish_date;
+
+    public readonly ?string $published_at;
+
+    public readonly ?string $published_timestamp;
 
     public readonly ?string $body_markdown;
 
@@ -34,7 +38,11 @@ class Article
 
         $this->slug = data_get($data, 'slug');
 
+        $this->readable_publish_date = data_get($data, 'readable_publish_date');
+
         $this->published_timestamp = data_get($data, 'published_timestamp');
+
+        $this->published_at = data_get($data, 'published_at');
 
         $this->body_html = data_get($data, 'body_html');
 

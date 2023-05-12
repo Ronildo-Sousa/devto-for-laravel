@@ -33,6 +33,14 @@ function articleFakeRequest($without_api_key = false)
         },
 
         '/articles/258' => function ($request) use ($singleArticle, $without_api_key) {
+            $requestData = json_decode($request->body(), true);
+
+            if ($requestData) {
+                foreach ($requestData['article'] as $key => $value) {
+                    $singleArticle[1][$key] = $value;
+                }
+            }
+
             if ((!empty($request->headers()['api-key'][0]) && !$without_api_key)) {
                 return ($request->method() == 'PUT')
                     ? Http::response($singleArticle[1])

@@ -27,7 +27,23 @@ it('should be able to update an user article', function () {
         ->and($response->description)
         ->toBe('my updated description')
         ->and($response->body_markdown)
-        ->toBe('my updated body_markdown');
+        ->toBe('my updated body markdown');
+});
+
+it('should be able to unpublish an user article', function () {
+    articleFakeRequest();
+
+    $response = DevtoForLaravel::articles()
+        ->unpublish(258);
+
+    expect($response)
+        ->toBeInstanceOf(Article::class)
+        ->and($response->published_at)
+        ->toBeNull()
+        ->and($response->readable_publish_date)
+        ->toBeNull()
+        ->and($response->published_timestamp)
+        ->toBe('');
 });
 
 it('should not be able to update without api-key', function () {

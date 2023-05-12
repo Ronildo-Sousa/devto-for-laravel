@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -28,6 +28,15 @@ class Articles extends BaseEndpoint
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function unpublish(int $id): Article|Collection
+    {
+        return $this->update($id, [
+            'published_at'          => null,
+            'published_timestamp'   => '',
+            'readable_publish_date' => null,
+        ]);
+    }
 
     public function published(): static
     {
