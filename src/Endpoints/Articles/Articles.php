@@ -44,6 +44,13 @@ class Articles extends BaseEndpoint
         return new Article($response->toArray());
     }
 
+    public function publish(int $id): Article|Collection
+    {
+        return $this->update($id, [
+            'published'          => true,
+        ]);
+    }
+
     public function unpublish(int $id): Article|Collection
     {
         return $this->update($id, [

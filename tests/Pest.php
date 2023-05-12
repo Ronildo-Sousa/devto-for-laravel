@@ -44,8 +44,9 @@ function articleFakeRequest($without_api_key = false)
                 return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
             }
 
+            $published = json_decode($request->body(), true)['article']['published'];
             if (($request->method() == 'PUT')) {
-                $singleArticle[1]['published_timestamp'] = '';
+                $singleArticle[1]['published_timestamp'] = ($published) ? now()->format('Y-m-d H:i:s') : '';
 
                 return $singleArticle[1];
             }
