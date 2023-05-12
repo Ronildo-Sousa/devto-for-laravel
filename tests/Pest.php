@@ -2,6 +2,7 @@
 
 declare(strict_types = 1);
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use RonildoSousa\DevtoForLaravel\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,42 +16,58 @@ function articleFakeRequest($without_api_key = false)
 
     Http::fake([
         '/articles/me/unpublished?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
-            return (!empty($request->headers()['api-key'][0]) && !$without_api_key)
-                ? Http::response([$multipleArticles[2]])
-                : Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            if (isWithoutCredentials($request, $without_api_key)) {
+                return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            }
+
+            return Http::response([$multipleArticles[2]]);
         },
 
         '/articles/me/published?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
-            return (!empty($request->headers()['api-key'][0]) && !$without_api_key)
-                ? Http::response([$multipleArticles[0], $multipleArticles[1]])
-                : Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            if (isWithoutCredentials($request, $without_api_key)) {
+                return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            }
+
+            return Http::response([$multipleArticles[0], $multipleArticles[1]]);
         },
 
         '/articles/me/all?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
-            return (!empty($request->headers()['api-key'][0]) && !$without_api_key)
-                ? Http::response($multipleArticles)
-                : Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            if (isWithoutCredentials($request, $without_api_key)) {
+                return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            }
+
+            return Http::response($multipleArticles);
         },
 
         '/articles/258' => function ($request) use ($singleArticle, $without_api_key) {
-            $requestData = json_decode($request->body(), true);
+            if (isWithoutCredentials($request, $without_api_key)) {
+                return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            }
 
-            if ($requestData) {
+            if (($request->method() == 'PUT')) {
+                $requestData = json_decode($request->body(), true);
+
                 foreach ($requestData['article'] as $key => $value) {
                     $singleArticle[1][$key] = $value;
                 }
+
+                return $singleArticle[1];
             }
 
-            if ((!empty($request->headers()['api-key'][0]) && !$without_api_key)) {
-                return ($request->method() == 'PUT')
-                    ? Http::response($singleArticle[1])
-                    : Http::response($singleArticle[0]);
-            }
-
-            return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            return Http::response($singleArticle[0]);
         },
 
         '/articles/0' => Http::response(['error' => 'not found', 'status' => 404], Response::HTTP_NOT_FOUND),
+
+        '/articles' => function ($request) use ($singleArticle, $without_api_key) {
+            if (isWithoutCredentials($request, $without_api_key)) {
+                return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
+            }
+
+            if ($request->method() == 'POST') {
+                return Http::response($singleArticle[2]);
+            }
+        },
 
         '/articles?per_page=30' => Http::response($multipleArticles),
 
@@ -66,4 +83,9 @@ function articleFakeRequest($without_api_key = false)
 
         '&page=2' => Http::response($multipleArticles),
     ]);
+}
+
+function isWithoutCredentials(Request $request, bool $without_api_key)
+{
+    return empty($request->headers()['api-key'][0]) || $without_api_key;
 }

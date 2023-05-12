@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -28,6 +28,21 @@ class Articles extends BaseEndpoint
     private array $tags_include = [];
 
     private array $tags_exclude = [];
+
+    public function create(array $payload): Article|Collection
+    {
+        $response = $this->service
+            ->api->post('/articles', ['article' => $payload]);
+
+        $status   = $response->status();
+        $response = $response->collect();
+
+        if ($status !== Response::HTTP_OK) {
+            return $response;
+        }
+
+        return new Article($response->toArray());
+    }
 
     public function unpublish(int $id): Article|Collection
     {
