@@ -16,6 +16,8 @@ class DevtoForLaravel
 
     public function __construct()
     {
-        $this->api = Http::withHeaders([])->baseUrl(config('devto-for-laravel.devto.base_url'));
+        $this->api = Http::withHeaders([
+            'api-key' => config('devto-for-laravel.devto.api-key'),
+        ])->baseUrl(config('devto-for-laravel.devto.base_url'));
     }
 }
