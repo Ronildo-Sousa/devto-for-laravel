@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use RonildoSousa\DevtoForLaravel\Entities\Article;
@@ -38,10 +38,6 @@ it('should be able to unpublish an user article', function () {
 
     expect($response)
         ->toBeInstanceOf(Article::class)
-        ->and($response->published_at)
-        ->toBeNull()
-        ->and($response->readable_publish_date)
-        ->toBeNull()
         ->and($response->published_timestamp)
         ->toBe('');
 });

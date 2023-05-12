@@ -47,9 +47,7 @@ class Articles extends BaseEndpoint
     public function unpublish(int $id): Article|Collection
     {
         return $this->update($id, [
-            'published_at'          => null,
-            'published_timestamp'   => '',
-            'readable_publish_date' => null,
+            'published'          => false,
         ]);
     }
 

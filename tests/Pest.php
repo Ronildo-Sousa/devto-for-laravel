@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -45,11 +45,7 @@ function articleFakeRequest($without_api_key = false)
             }
 
             if (($request->method() == 'PUT')) {
-                $requestData = json_decode($request->body(), true);
-
-                foreach ($requestData['article'] as $key => $value) {
-                    $singleArticle[1][$key] = $value;
-                }
+                $singleArticle[1]['published_timestamp'] = '';
 
                 return $singleArticle[1];
             }

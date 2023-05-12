@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 return [
     [
@@ -99,7 +99,7 @@ return [
             <p>Organic +1 pour-over banh mi disrupt listicle. Cronut offal flexitarian twee health poutine cred. Hashtag godard church-key etsy put a bird on it.</p>
 
         ",
-        "body_markdown" => "my updated body_markdown",
+        "body_markdown" => "my updated body markdown",
         "user"          => [
             "name"             => "Val Antonina \:/ Gleichner",
             "username"         => "username391",
