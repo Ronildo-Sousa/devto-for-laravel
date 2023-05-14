@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -44,8 +44,10 @@ function articleFakeRequest($without_api_key = false)
                 return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
             }
 
-            $published = json_decode($request->body(), true)['article']['published'];
             if (($request->method() == 'PUT')) {
+                $requestData = json_decode($request->body(), true);
+                $published   = data_get($requestData, 'article.published');
+
                 $singleArticle[1]['published_timestamp'] = ($published) ? now()->format('Y-m-d H:i:s') : '';
 
                 return $singleArticle[1];
