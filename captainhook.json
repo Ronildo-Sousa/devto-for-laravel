@@ -12,6 +12,12 @@
         "actions": [
             {
                 "action": "vendor/bin/pest --parallel"
+            },
+            {
+                "action": "vendor/bin/phpstan --error-format=github"
+            },
+            {
+                "action": "vendor/bin/pint --test"
             }
         ]
     },
