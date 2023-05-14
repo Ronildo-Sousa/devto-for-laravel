@@ -22,6 +22,8 @@
         "spatie/laravel-package-tools": "^1.14.0"
     },
     "require-dev": {
+        "captainhook/captainhook": "^5.16",
+        "captainhook/plugin-composer": "^5.3",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^7.9",
         "nunomaduro/larastan": "^2.0.1",
@@ -55,7 +57,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "captainhook/plugin-composer": true
         }
     },
     "extra": {
