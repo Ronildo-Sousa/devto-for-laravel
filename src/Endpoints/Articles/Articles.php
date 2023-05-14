@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
@@ -47,14 +47,14 @@ class Articles extends BaseEndpoint
     public function publish(int $id): Article|Collection
     {
         return $this->update($id, [
-            'published'          => true,
+            'published' => true,
         ]);
     }
 
     public function unpublish(int $id): Article|Collection
     {
         return $this->update($id, [
-            'published'          => false,
+            'published' => false,
         ]);
     }
 
