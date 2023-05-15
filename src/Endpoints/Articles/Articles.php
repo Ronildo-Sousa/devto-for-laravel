@@ -11,23 +11,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Articles extends BaseEndpoint
 {
-    private string $from = "";
+    private int $per_page = 30;
+
+    private string $username = "";
 
     private ?int $page = null;
 
-    private bool $return_latest = false;
+    private string $latest = '';
 
-    private string $return_me = '';
+    private string $me = '';
 
-    private string $return_published = '';
+    private string $published = '';
 
-    private string $return_unpublished = '';
+    private string $unpublished = '';
 
-    private int $per_page = 30;
+    private string $tags = '';
 
-    private array $tags_include = [];
-
-    private array $tags_exclude = [];
+    private string $tags_exclude = '';
 
     public function create(array $payload): Article|Collection
     {
@@ -60,28 +60,28 @@ class Articles extends BaseEndpoint
 
     public function published(): static
     {
-        $this->return_published = '/published';
+        $this->published = 'published';
 
         return $this;
     }
 
     public function unpublished(): static
     {
-        $this->return_unpublished = '/unpublished';
+        $this->unpublished = 'unpublished';
 
         return $this;
     }
 
     public function me(): static
     {
-        $this->return_me = '/me';
+        $this->me = 'me';
 
         return $this;
     }
 
     public function latest(): static
     {
-        $this->return_latest = true;
+        $this->latest = 'latest';
 
         return $this;
     }
@@ -95,21 +95,21 @@ class Articles extends BaseEndpoint
 
     public function from(string $name): static
     {
-        $this->from = $name;
+        $this->username = $name;
 
         return $this;
     }
 
     public function withoutTags(array $tags): static
     {
-        $this->tags_exclude = $tags;
+        $this->tags_exclude = implode(',', $tags);
 
         return $this;
     }
 
     public function withTags(array $tags): static
     {
-        $this->tags_include = $tags;
+        $this->tags = implode(',', $tags);
 
         return $this;
     }
@@ -155,16 +155,20 @@ class Articles extends BaseEndpoint
 
     public function get(): Collection
     {
-        $getLatest = ($this->return_latest) ? '/latest' : '';
+        $propertiesExclude = ['latest', 'me', 'published', 'unpublished', 'service'];
+        $propertiesPath    = '';
+        $propertiesPath .= collect($propertiesExclude)
+            ->filter(fn ($value) => $this->$value && $value !== 'service')
+            ->map(fn ($value) => ($this->me && !$this->published && !$this->unpublished) ? "{$this->me}/all" : $value)
+            ->implode('/');
 
-        $getMe = $this->getMeUri();
+        $prefix = '/articles' . ($propertiesPath ? "/$propertiesPath" : '');
 
-        $uri = $this->makeUri("/articles{$getLatest}{$getMe}");
+        $uri = $this->makeUri($prefix, $propertiesExclude);
 
         $response = $this->service
             ->api
             ->get($uri);
-
         $status   = $response->status();
         $response = $response->collect();
 
@@ -175,49 +179,16 @@ class Articles extends BaseEndpoint
         return $this->transform($response, Article::class);
     }
 
-    private function getMeUri(): ?string
+    private function makeUri(string $prefix = '', array $withouProperties = []): string
     {
-        if ($this->return_me) {
-            if ($this->return_published) {
-                return $this->return_me . $this->return_published;
-            }
+        $classProperties = get_class_vars(__CLASS__);
+        $classProperties = collect($classProperties)
+            ->filter(fn ($value, $key) => !in_array($key, $withouProperties))
+            ->map(fn ($value, $key) => $this->$key)
+            ->filter(fn ($value) => $value);
 
-            if ($this->return_unpublished) {
-                return $this->return_me . $this->return_unpublished;
-            }
+        $query = http_build_query($classProperties->toArray());
 
-            return $this->return_me . '/all';
-        }
-
-        return null;
-    }
-
-    private function makeUri(string $prefix = ''): string
-    {
-        $uri = "{$prefix}?";
-        $i   = 0;
-
-        $properties = [
-            'per_page'     => $this->per_page,
-            'tags'         => $this->tags_include,
-            'tags_exclude' => $this->tags_exclude,
-            'username'     => $this->from,
-            'page'         => $this->page,
-        ];
-
-        foreach ($properties as $key => $value) {
-            if (empty($value) || $value == "") {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $value = implode(',', $value);
-            }
-            $uri .= (($i !== 0) ? '&' : '') . "{$key}={$value}";
-
-            $i++;
-        }
-
-        return $uri;
+        return "{$prefix}?{$query}";
     }
 }
