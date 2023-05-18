@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use RonildoSousa\DevtoForLaravel\Entities\Article;
+use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Facades\DevtoForLaravel;
 
 beforeEach(function () {
@@ -22,7 +22,7 @@ it('should get a feed article list', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each
-        ->toBeInstanceOf(Article::class)
+        ->toBeInstanceOf(ArticleEntity::class)
         ->and($first->id)
         ->toBe(1544)
         ->and($first->title)
@@ -42,7 +42,7 @@ it('should be able to set items per page', function () {
         ->toBe(2)
         ->and($articles)
         ->each
-        ->toBeInstanceOf(Article::class);
+        ->toBeInstanceOf(ArticleEntity::class);
 });
 
 it('should be able to get items with requested tags', function () {
@@ -54,7 +54,7 @@ it('should be able to get items with requested tags', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each(function ($article) {
-            $article->toBeInstanceOf(Article::class);
+            $article->toBeInstanceOf(ArticleEntity::class);
             $article->tags->toContain('discuss');
         });
 });
@@ -68,7 +68,7 @@ it('should be able to get items without requested tags', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each(function ($article) {
-            $article->toBeInstanceOf(Article::class);
+            $article->toBeInstanceOf(ArticleEntity::class);
             $article->tags->not->toContain('discuss');
         });
 });
@@ -82,7 +82,7 @@ it('should be able to get articles from a given user', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each(function ($article) {
-            $article->toBeInstanceOf(Article::class);
+            $article->toBeInstanceOf(ArticleEntity::class);
             $article->user->toContain('ben');
         });
 });
@@ -96,7 +96,7 @@ it('should be able to choose a page result', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each
-        ->toBeInstanceOf(Article::class);
+        ->toBeInstanceOf(ArticleEntity::class);
 });
 
 it('should be able to get latest articles', function () {
@@ -108,7 +108,7 @@ it('should be able to get latest articles', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each
-        ->toBeInstanceOf(Article::class);
+        ->toBeInstanceOf(ArticleEntity::class);
 });
 
 it('should be able to get an article by id', function () {
@@ -116,7 +116,7 @@ it('should be able to get an article by id', function () {
         ->find(258);
 
     expect($article)
-        ->toBeInstanceOf(Article::class)
+        ->toBeInstanceOf(ArticleEntity::class)
         ->and($article->id)
         ->toBe(258)
         ->and($article->title)

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel\Entities;
 
-class Article
+class ArticleEntity
 {
     public readonly int $id;
 
