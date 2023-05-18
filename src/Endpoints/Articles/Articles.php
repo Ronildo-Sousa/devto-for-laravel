@@ -18,7 +18,7 @@ class Articles extends BaseEndpoint
 
     private int $per_page = 30;
 
-    private string $username = "";
+    private string $username = '';
 
     private ?int $page = null;
 
