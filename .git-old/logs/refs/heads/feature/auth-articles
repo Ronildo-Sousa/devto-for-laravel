@@ -1,0 +1,10 @@
+0000000000000000000000000000000000000000 abfb4df82427730aa16ed1b68aee0d0fb2a4bd45 Ronildo Sousa <sousaronildo400@gmail.com> 1683736847 -0300	branch: Created from HEAD
+abfb4df82427730aa16ed1b68aee0d0fb2a4bd45 2c0e5a12f458949fb3147d1907e665b826e78992 Ronildo Sousa <sousaronildo400@gmail.com> 1683740979 -0300	commit: getting the auth user's articles
+2c0e5a12f458949fb3147d1907e665b826e78992 107564072fb8a9156a8ab39f74816f658a2605a2 Ronildo Sousa <sousaronildo400@gmail.com> 1683744175 -0300	commit: should be able to get only published articles
+107564072fb8a9156a8ab39f74816f658a2605a2 24f3b6bfd241dcaf8864c8a3409b8201be69b7ba Ronildo Sousa <sousaronildo400@gmail.com> 1683744408 -0300	commit: should be able to get only unpublished articles
+24f3b6bfd241dcaf8864c8a3409b8201be69b7ba 6c6f725728a4272b1df7f12573b91bdf83eb9cc0 Ronildo Sousa <sousaronildo400@gmail.com> 1683756765 -0300	commit: it 'should be able to update an user article
+6c6f725728a4272b1df7f12573b91bdf83eb9cc0 37ab4f073264e1b00eca3ca0022874dd9343b695 Ronildo Sousa <sousaronildo400@gmail.com> 1683757216 -0300	commit: it should not be able to update without api-key
+37ab4f073264e1b00eca3ca0022874dd9343b695 5a3735a481071128e1bbe2746ff397c62da39e51 Ronildo Sousa <sousaronildo400@gmail.com> 1683912626 -0300	commit: it should be able to unpublish an user article
+5a3735a481071128e1bbe2746ff397c62da39e51 29a1241e901e26871d4a151e585cd978bb827f73 Ronildo Sousa <sousaronildo400@gmail.com> 1683921760 -0300	commit: should not be able to create an article without api-key
+29a1241e901e26871d4a151e585cd978bb827f73 3005c26171549d45c5db4462fdf70372562b1bc8 Ronildo Sousa <sousaronildo400@gmail.com> 1683922784 -0300	commit: refactoring unpublish article workflow
+3005c26171549d45c5db4462fdf70372562b1bc8 b837269645cfb0afefdde3e7814b8320fae89c4a Ronildo Sousa <sousaronildo400@gmail.com> 1683924620 -0300	commit: should be able to publish an user article draft

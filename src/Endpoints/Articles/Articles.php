@@ -7,42 +7,32 @@ namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 use Illuminate\Support\Collection;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
 use RonildoSousa\DevtoForLaravel\Entities\Article;
+use RonildoSousa\DevtoForLaravel\Enums\HttpMethod;
 use Symfony\Component\HttpFoundation\Response;
 
 class Articles extends BaseEndpoint
 {
-    private string $from = "";
-
-    private ?int $page = null;
-
-    private bool $return_latest = false;
-
-    private string $return_me = '';
-
-    private string $return_published = '';
-
-    private string $return_unpublished = '';
+    private const URI_PROPERTIES = [
+        'latest', 'me', 'published', 'unpublished',
+    ];
 
     private int $per_page = 30;
 
-    private array $tags_include = [];
+    private string $username = "";
 
-    private array $tags_exclude = [];
+    private ?int $page = null;
 
-    public function create(array $payload): Article|Collection
-    {
-        $response = $this->service
-            ->api->post('/articles', ['article' => $payload]);
+    private string $latest = '';
 
-        $status   = $response->status();
-        $response = $response->collect();
+    private string $me = '';
 
-        if ($status !== Response::HTTP_OK) {
-            return $response;
-        }
+    private string $published = '';
 
-        return new Article($response->toArray());
-    }
+    private string $unpublished = '';
+
+    private string $tags = '';
+
+    private string $tags_exclude = '';
 
     public function publish(int $id): Article|Collection
     {
@@ -60,28 +50,28 @@ class Articles extends BaseEndpoint
 
     public function published(): static
     {
-        $this->return_published = '/published';
+        $this->published = 'published';
 
         return $this;
     }
 
     public function unpublished(): static
     {
-        $this->return_unpublished = '/unpublished';
+        $this->unpublished = 'unpublished';
 
         return $this;
     }
 
     public function me(): static
     {
-        $this->return_me = '/me';
+        $this->me = 'me';
 
         return $this;
     }
 
     public function latest(): static
     {
-        $this->return_latest = true;
+        $this->latest = 'latest';
 
         return $this;
     }
@@ -95,21 +85,21 @@ class Articles extends BaseEndpoint
 
     public function from(string $name): static
     {
-        $this->from = $name;
+        $this->username = $name;
 
         return $this;
     }
 
     public function withoutTags(array $tags): static
     {
-        $this->tags_exclude = $tags;
+        $this->tags_exclude = implode(',', $tags);
 
         return $this;
     }
 
     public function withTags(array $tags): static
     {
-        $this->tags_include = $tags;
+        $this->tags = implode(',', $tags);
 
         return $this;
     }
@@ -121,103 +111,67 @@ class Articles extends BaseEndpoint
         return $this;
     }
 
-    public function update(int $id, array $payload): Article|Collection
+    public function create(array $payload): Article|Collection
     {
-        $response = $this->service
-            ->api
-            ->put("/articles/{$id}", ['article' => $payload]);
+        $response = $this->request(HttpMethod::POST, '/articles', ['article' => $payload]);
 
-        $status   = $response->status();
-        $response = $response->collect();
-
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
         }
 
-        return new Article($response->toArray());
+        return new Article($response->collect()->toArray());
+    }
+
+    public function update(int $id, array $payload): Article|Collection
+    {
+        $response = $this->request(HttpMethod::PUT, "/articles/{$id}", ['article' => $payload]);
+
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
+        }
+
+        return new Article($response->collect()->toArray());
     }
 
     public function find(int $id): Article|Collection
     {
-        $response = $this->service
-            ->api
-            ->get("/articles/{$id}");
+        $response = $this->request(HttpMethod::GET, "/articles/{$id}");
 
-        $status   = $response->status();
-        $response = $response->collect();
-
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
         }
 
-        return new Article($response->toArray());
+        return new Article($response->collect()->toArray());
     }
 
     public function get(): Collection
     {
-        $getLatest = ($this->return_latest) ? '/latest' : '';
+        $propertiesUri = collect(self::URI_PROPERTIES)
+            ->filter(fn ($value) => $this->$value)
+            ->map(fn ($value) => ($this->me && !$this->published && !$this->unpublished) ? "{$this->me}/all" : $value)
+            ->implode('/');
 
-        $getMe = $this->getMeUri();
+        $prefix = '/articles' . ($propertiesUri ? "/$propertiesUri" : '');
 
-        $uri = $this->makeUri("/articles{$getLatest}{$getMe}");
+        $uri = $this->makeUri($prefix, self::URI_PROPERTIES);
 
-        $response = $this->service
-            ->api
-            ->get($uri);
+        $response = $this->request(HttpMethod::GET, $uri);
 
-        $status   = $response->status();
-        $response = $response->collect();
-
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
         }
 
-        return $this->transform($response, Article::class);
+        return $this->transform($response->collect(), Article::class);
     }
 
-    private function getMeUri(): ?string
+    private function makeUri(string $prefix = '', array $uriParams = []): string
     {
-        if ($this->return_me) {
-            if ($this->return_published) {
-                return $this->return_me . $this->return_published;
-            }
+        $queryParams = collect(get_object_vars($this))
+            ->filter(fn ($value, $key) => !in_array($key, $uriParams) && !blank($value))
+            ->toArray();
 
-            if ($this->return_unpublished) {
-                return $this->return_me . $this->return_unpublished;
-            }
+        $query = http_build_query($queryParams);
 
-            return $this->return_me . '/all';
-        }
-
-        return null;
-    }
-
-    private function makeUri(string $prefix = ''): string
-    {
-        $uri = "{$prefix}?";
-        $i   = 0;
-
-        $properties = [
-            'per_page'     => $this->per_page,
-            'tags'         => $this->tags_include,
-            'tags_exclude' => $this->tags_exclude,
-            'username'     => $this->from,
-            'page'         => $this->page,
-        ];
-
-        foreach ($properties as $key => $value) {
-            if (empty($value) || $value == "") {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $value = implode(',', $value);
-            }
-            $uri .= (($i !== 0) ? '&' : '') . "{$key}={$value}";
-
-            $i++;
-        }
-
-        return $uri;
+        return "{$prefix}?{$query}";
     }
 }
