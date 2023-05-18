@@ -7,7 +7,7 @@ namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 use Illuminate\Support\Collection;
 use RonildoSousa\DevtoForLaravel\Contracts\ArticleEndpointInterface;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
-use RonildoSousa\DevtoForLaravel\Entities\Article;
+use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Enums\HttpMethod;
 use RonildoSousa\DevtoForLaravel\Traits\{HasBuildUri, HasFilterByLatest, HasFilterByTags, HasFilterByUserArticles, HasFilterByUsername, HasItemsPerPage};
 use Symfony\Component\HttpFoundation\Response;
@@ -25,21 +25,21 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
         'latest', 'me', 'published', 'unpublished',
     ];
 
-    public function publish(int $id): Article|Collection
+    public function publish(int $id): ArticleEntity|Collection
     {
         return $this->update($id, [
             'published' => true,
         ]);
     }
 
-    public function unpublish(int $id): Article|Collection
+    public function unpublish(int $id): ArticleEntity|Collection
     {
         return $this->update($id, [
             'published' => false,
         ]);
     }
 
-    public function create(array $payload): Article|Collection
+    public function create(array $payload): ArticleEntity|Collection
     {
         $response = $this->request(HttpMethod::POST, '/articles', ['article' => $payload]);
 
@@ -47,10 +47,10 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
             return $response->collect();
         }
 
-        return new Article($response->collect()->toArray());
+        return new ArticleEntity($response->collect()->toArray());
     }
 
-    public function update(int $id, array $payload): Article|Collection
+    public function update(int $id, array $payload): ArticleEntity|Collection
     {
         $response = $this->request(HttpMethod::PUT, "/articles/{$id}", ['article' => $payload]);
 
@@ -58,10 +58,10 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
             return $response->collect();
         }
 
-        return new Article($response->collect()->toArray());
+        return new ArticleEntity($response->collect()->toArray());
     }
 
-    public function find(int $id): Article|Collection
+    public function find(int $id): ArticleEntity|Collection
     {
         $response = $this->request(HttpMethod::GET, "/articles/{$id}");
 
@@ -69,7 +69,7 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
             return $response->collect();
         }
 
-        return new Article($response->collect()->toArray());
+        return new ArticleEntity($response->collect()->toArray());
     }
 
     public function get(): Collection
@@ -82,6 +82,6 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
             return $response->collect();
         }
 
-        return $this->transform($response->collect(), Article::class);
+        return $this->transform($response->collect(), ArticleEntity::class);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use RonildoSousa\DevtoForLaravel\Entities\Article;
+use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Facades\DevtoForLaravel;
 
 beforeEach(function () {
@@ -23,7 +23,7 @@ it('should get articles from authenticated user', function () {
         ->toBeInstanceOf(Collection::class)
         ->and($articles)
         ->each
-        ->toBeInstanceOf(Article::class)
+        ->toBeInstanceOf(ArticleEntity::class)
         ->and($first->id)
         ->toBe(1544)
         ->and($first->title)
@@ -56,7 +56,7 @@ it('should be able to get only published articles', function () {
     expect($response)
         ->toBeInstanceOf(Collection::class)
         ->each
-        ->toBeInstanceOf(Article::class)
+        ->toBeInstanceOf(ArticleEntity::class)
         ->and($response)
         ->each(fn ($item) => $item->published_timestamp->not->toBeNull());
 });
@@ -72,7 +72,7 @@ it('should be able to get only unpublished articles', function () {
     expect($response)
         ->toBeInstanceOf(Collection::class)
         ->each
-        ->toBeInstanceOf(Article::class)
+        ->toBeInstanceOf(ArticleEntity::class)
         ->and($response)
         ->each(fn ($item) => $item->published_timestamp->toBe(''));
 });

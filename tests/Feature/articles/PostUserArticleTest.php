@@ -3,7 +3,7 @@
 declare(strict_types = 1);
 
 use Illuminate\Support\Facades\Http;
-use RonildoSousa\DevtoForLaravel\Entities\Article;
+use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Facades\DevtoForLaravel;
 
 beforeEach(function () {
@@ -24,7 +24,7 @@ it('should be able to create an article', function () {
         ]);
 
     expect($response)
-        ->toBeInstanceOf(Article::class)
+        ->toBeInstanceOf(ArticleEntity::class)
         ->and($response->title)
         ->toBe('My created article title')
         ->and($response->description)
