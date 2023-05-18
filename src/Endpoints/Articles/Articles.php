@@ -5,34 +5,24 @@ declare(strict_types = 1);
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
 use Illuminate\Support\Collection;
+use RonildoSousa\DevtoForLaravel\Contracts\ArticleEndpointInterface;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
 use RonildoSousa\DevtoForLaravel\Entities\Article;
 use RonildoSousa\DevtoForLaravel\Enums\HttpMethod;
+use RonildoSousa\DevtoForLaravel\Traits\{HasFilterByLatest, HasFilterByTags, HasFilterByUserArticles, HasFilterByUsername, HasItemsPerPage};
 use Symfony\Component\HttpFoundation\Response;
 
-class Articles extends BaseEndpoint
+class Articles extends BaseEndpoint implements ArticleEndpointInterface
 {
+    use HasItemsPerPage;
+    use HasFilterByUserArticles;
+    use HasFilterByTags;
+    use HasFilterByUsername;
+    use HasFilterByLatest;
+
     private const URI_PROPERTIES = [
         'latest', 'me', 'published', 'unpublished',
     ];
-
-    private int $per_page = 30;
-
-    private string $username = '';
-
-    private ?int $page = null;
-
-    private string $latest = '';
-
-    private string $me = '';
-
-    private string $published = '';
-
-    private string $unpublished = '';
-
-    private string $tags = '';
-
-    private string $tags_exclude = '';
 
     public function publish(int $id): Article|Collection
     {
@@ -46,69 +36,6 @@ class Articles extends BaseEndpoint
         return $this->update($id, [
             'published' => false,
         ]);
-    }
-
-    public function published(): static
-    {
-        $this->published = 'published';
-
-        return $this;
-    }
-
-    public function unpublished(): static
-    {
-        $this->unpublished = 'unpublished';
-
-        return $this;
-    }
-
-    public function me(): static
-    {
-        $this->me = 'me';
-
-        return $this;
-    }
-
-    public function latest(): static
-    {
-        $this->latest = 'latest';
-
-        return $this;
-    }
-
-    public function fromPage(int $page): static
-    {
-        $this->page = $page;
-
-        return $this;
-    }
-
-    public function from(string $name): static
-    {
-        $this->username = $name;
-
-        return $this;
-    }
-
-    public function withoutTags(array $tags): static
-    {
-        $this->tags_exclude = implode(',', $tags);
-
-        return $this;
-    }
-
-    public function withTags(array $tags): static
-    {
-        $this->tags = implode(',', $tags);
-
-        return $this;
-    }
-
-    public function perPage(int $per_page): static
-    {
-        $this->per_page = $per_page;
-
-        return $this;
     }
 
     public function create(array $payload): Article|Collection
