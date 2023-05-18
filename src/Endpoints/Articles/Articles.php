@@ -6,6 +6,7 @@ namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
 use Illuminate\Support\Collection;
 use RonildoSousa\DevtoForLaravel\Contracts\ArticleEndpointInterface;
+use RonildoSousa\DevtoForLaravel\DTO\ArticleDTO;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
 use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Enums\HttpMethod;
@@ -27,21 +28,25 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
 
     public function publish(int $id): ArticleEntity|Collection
     {
-        return $this->update($id, [
-            'published' => true,
-        ]);
+        $data              = collect($this->find($id))->toArray();
+        $data['published'] = true;
+        $article           = ArticleDTO::fromArray($data);
+
+        return $this->update($id, $article);
     }
 
     public function unpublish(int $id): ArticleEntity|Collection
     {
-        return $this->update($id, [
-            'published' => false,
-        ]);
+        $data              = collect($this->find($id))->toArray();
+        $data['published'] = false;
+        $article           = ArticleDTO::fromArray($data);
+
+        return $this->update($id, $article);
     }
 
-    public function create(array $payload): ArticleEntity|Collection
+    public function create(ArticleDTO $payload): ArticleEntity|Collection
     {
-        $response = $this->request(HttpMethod::POST, '/articles', ['article' => $payload]);
+        $response = $this->request(HttpMethod::POST, '/articles', ['article' => $payload->toArray()]);
 
         if ($response->status() !== Response::HTTP_OK) {
             return $response->collect();
@@ -50,9 +55,9 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
         return new ArticleEntity($response->collect()->toArray());
     }
 
-    public function update(int $id, array $payload): ArticleEntity|Collection
+    public function update(int $id, ArticleDTO $payload): ArticleEntity|Collection
     {
-        $response = $this->request(HttpMethod::PUT, "/articles/{$id}", ['article' => $payload]);
+        $response = $this->request(HttpMethod::PUT, "/articles/{$id}", ['article' => $payload->toArray()]);
 
         if ($response->status() !== Response::HTTP_OK) {
             return $response->collect();

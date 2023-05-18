@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use RonildoSousa\DevtoForLaravel\DTO\ArticleDTO;
 use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Facades\DevtoForLaravel;
 
@@ -14,12 +15,15 @@ beforeEach(function () {
 it('should be able to update an user article', function () {
     articleFakeRequest();
 
+    $article = ArticleDTO::fromArray([
+        'title'         => 'my updated title',
+        'description'   => 'my updated description',
+        'body_markdown' => 'my updated body markdown',
+        'tags'          => 'discuss',
+    ]);
+
     $response = DevtoForLaravel::articles()
-        ->update(258, [
-            'title'         => 'my updated title',
-            'description'   => 'my updated description',
-            'body_markdown' => 'my updated body markdown',
-        ]);
+        ->update(258, $article);
 
     expect($response)
         ->toBeInstanceOf(ArticleEntity::class)
@@ -59,12 +63,14 @@ it('should be able to publish an user article draft', function () {
 it('should not be able to update without api-key', function () {
     articleFakeRequest(true);
 
+    $article = ArticleDTO::fromArray([
+        'title'         => 'my updated title',
+        'description'   => 'my updated description',
+        'body_markdown' => 'my updated body markdown',
+        'tags'          => 'discuss',
+    ]);
     $response = DevtoForLaravel::articles()
-        ->update(258, [
-            'title'         => 'my updated title',
-            'description'   => 'my updated description',
-            'body_markdown' => 'my updated body markdown',
-        ]);
+        ->update(258, $article);
 
     expect($response->get('status'))
         ->toBe(401)

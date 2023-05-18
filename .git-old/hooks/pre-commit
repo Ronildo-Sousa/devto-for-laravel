@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# installed by CaptainHook 5.16.4
-
-INTERACTIVE="--no-interaction"
-
-vendor/bin/captainhook $INTERACTIVE --configuration=captainhook.json --bootstrap=vendor/autoload.php hook:pre-commit "$@" <&0

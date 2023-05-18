@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use Illuminate\Support\Facades\Http;
+use RonildoSousa\DevtoForLaravel\DTO\ArticleDTO;
 use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
 use RonildoSousa\DevtoForLaravel\Facades\DevtoForLaravel;
 
@@ -12,16 +13,17 @@ beforeEach(function () {
 
 it('should be able to create an article', function () {
     articleFakeRequest();
+    $article = ArticleDTO::fromArray([
+        'title'         => 'My created article title',
+        'description'   => 'My created article description',
+        'body_markdown' => '# My created article body',
+        'published'     => true,
+        'main_image'    => 'https://picsum.photos/200/300',
+        'tags'          => 'discuss',
+    ]);
 
     $response = DevtoForLaravel::articles()
-        ->create([
-            'title'         => 'My created article title',
-            'description'   => 'My created article description',
-            'body_markdown' => '# My created article body',
-            'published'     => true,
-            'main_image'    => 'https://picsum.photos/200/300',
-            'tags'          => 'discuss',
-        ]);
+        ->create($article);
 
     expect($response)
         ->toBeInstanceOf(ArticleEntity::class)
@@ -36,15 +38,15 @@ it('should be able to create an article', function () {
 it('should not be able to create an article without api-key', function () {
     articleFakeRequest(true);
 
+    $article = ArticleDTO::fromArray([
+        'title'         => 'My created article title',
+        'description'   => 'My created article description',
+        'body_markdown' => '# My created article body',
+        'tags'          => 'discuss',
+    ]);
+
     $response = DevtoForLaravel::articles()
-        ->create([
-            'title'         => 'My created article title',
-            'description'   => 'My created article description',
-            'body_markdown' => '# My created article body',
-            'published'     => true,
-            'main_image'    => 'https://picsum.photos/200/300',
-            'tags'          => 'discuss',
-        ]);
+        ->create($article);
 
     expect($response->get('error'))
         ->toBe('unauthorized')
