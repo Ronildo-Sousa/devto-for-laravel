@@ -9,7 +9,7 @@ use RonildoSousa\DevtoForLaravel\Contracts\ArticleEndpointInterface;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
 use RonildoSousa\DevtoForLaravel\Entities\Article;
 use RonildoSousa\DevtoForLaravel\Enums\HttpMethod;
-use RonildoSousa\DevtoForLaravel\Traits\{HasFilterByLatest, HasFilterByTags, HasFilterByUserArticles, HasFilterByUsername, HasItemsPerPage};
+use RonildoSousa\DevtoForLaravel\Traits\{HasBuildUri, HasFilterByLatest, HasFilterByTags, HasFilterByUserArticles, HasFilterByUsername, HasItemsPerPage};
 use Symfony\Component\HttpFoundation\Response;
 
 class Articles extends BaseEndpoint implements ArticleEndpointInterface
@@ -19,8 +19,9 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
     use HasFilterByTags;
     use HasFilterByUsername;
     use HasFilterByLatest;
+    use HasBuildUri;
 
-    private const URI_PROPERTIES = [
+    private const URI_PATHS = [
         'latest', 'me', 'published', 'unpublished',
     ];
 
@@ -73,14 +74,7 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
 
     public function get(): Collection
     {
-        $propertiesUri = collect(self::URI_PROPERTIES)
-            ->filter(fn ($value) => $this->$value)
-            ->map(fn ($value) => ($this->me && !$this->published && !$this->unpublished) ? "{$this->me}/all" : $value)
-            ->implode('/');
-
-        $prefix = '/articles' . ($propertiesUri ? "/$propertiesUri" : '');
-
-        $uri = $this->makeUri($prefix, self::URI_PROPERTIES);
+        $uri = 'articles' . $this->buildUriWithQueryParams(self::URI_PATHS);
 
         $response = $this->request(HttpMethod::GET, $uri);
 
@@ -89,16 +83,5 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
         }
 
         return $this->transform($response->collect(), Article::class);
-    }
-
-    private function makeUri(string $prefix = '', array $uriParams = []): string
-    {
-        $queryParams = collect(get_object_vars($this))
-            ->filter(fn ($value, $key) => !in_array($key, $uriParams) && !blank($value))
-            ->toArray();
-
-        $query = http_build_query($queryParams);
-
-        return "{$prefix}?{$query}";
     }
 }
