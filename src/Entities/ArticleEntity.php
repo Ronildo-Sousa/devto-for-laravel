@@ -30,11 +30,11 @@ class ArticleEntity
 
     public int $positive_reactions_count;
 
-    public string $cover_image;
+    public ?string $cover_image;
 
-    public string $social_image;
+    public ?string $social_image;
 
-    public string $canonical_url;
+    public ?string $canonical_url;
 
     public ?string $created_at;
 
@@ -62,7 +62,7 @@ class ArticleEntity
 
     public array $user;
 
-    public array $flare_tag;
+    public ?array $flare_tag;
 
     public function __construct(array $data)
     {
@@ -123,5 +123,10 @@ class ArticleEntity
         $this->user = data_get($data, 'user');
 
         $this->flare_tag = data_get($data, 'flare_tag');
+    }
+
+    public function toArray(): array
+    {
+        return (array) $this;
     }
 }

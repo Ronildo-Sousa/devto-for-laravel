@@ -37,11 +37,17 @@ class Articles extends BaseEndpoint implements ArticleEndpointInterface
 
     public function unpublish(int $id): ArticleEntity|Collection
     {
-        $data              = collect($this->find($id))->toArray();
-        $data['published'] = false;
-        $article           = ArticleDTO::fromArray($data);
+        /** @var ?ArticleEntity $data */
+        $data = $this->find($id);
 
-        return $this->update($id, $article);
+        if ($data instanceof ArticleEntity) {
+            $data->published = false;
+            $article         = ArticleDTO::fromArray($data->toArray());
+
+            return $this->update($id, $article);
+        }
+
+        return collect(['status' => 404, 'error' => 'not found']);
     }
 
     public function create(ArticleDTO $payload): ArticleEntity|Collection

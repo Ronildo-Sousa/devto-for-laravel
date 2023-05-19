@@ -10,7 +10,7 @@ class ArticleDTO
         public readonly string $title,
         public readonly string $description,
         public readonly string $body_markdown,
-        public readonly string $tags,
+        public readonly ?string $tags = null,
         public readonly bool $published = false,
         public readonly ?string $series = null,
         public readonly ?string $main_image = null,
