@@ -5,219 +5,94 @@ declare(strict_types = 1);
 namespace RonildoSousa\DevtoForLaravel\Endpoints\Articles;
 
 use Illuminate\Support\Collection;
+use RonildoSousa\DevtoForLaravel\Contracts\ArticleEndpointInterface;
+use RonildoSousa\DevtoForLaravel\DTO\ArticleDTO;
 use RonildoSousa\DevtoForLaravel\Endpoints\BaseEndpoint;
-use RonildoSousa\DevtoForLaravel\Entities\Article;
+use RonildoSousa\DevtoForLaravel\Entities\ArticleEntity;
+use RonildoSousa\DevtoForLaravel\Enums\HttpMethod;
+use RonildoSousa\DevtoForLaravel\Traits\{HasBuildUri, HasFilterByLatest, HasFilterByTags, HasFilterByUserArticles, HasFilterByUsername, HasItemsPerPage};
 use Symfony\Component\HttpFoundation\Response;
 
-class Articles extends BaseEndpoint
+class Articles extends BaseEndpoint implements ArticleEndpointInterface
 {
-    private string $from = "";
+    use HasItemsPerPage;
+    use HasFilterByUserArticles;
+    use HasFilterByTags;
+    use HasFilterByUsername;
+    use HasFilterByLatest;
+    use HasBuildUri;
 
-    private ?int $page = null;
+    private const URI_PATHS = [
+        'latest', 'me', 'published', 'unpublished',
+    ];
 
-    private bool $return_latest = false;
-
-    private string $return_me = '';
-
-    private string $return_published = '';
-
-    private string $return_unpublished = '';
-
-    private int $per_page = 30;
-
-    private array $tags_include = [];
-
-    private array $tags_exclude = [];
-
-    public function create(array $payload): Article|Collection
+    public function publish(int $id): ArticleEntity|Collection
     {
-        $response = $this->service
-            ->api->post('/articles', ['article' => $payload]);
+        $data              = collect($this->find($id))->toArray();
+        $data['published'] = true;
+        $article           = ArticleDTO::fromArray($data);
 
-        $status   = $response->status();
-        $response = $response->collect();
+        return $this->update($id, $article);
+    }
 
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+    public function unpublish(int $id): ArticleEntity|Collection
+    {
+        /** @var ?ArticleEntity $data */
+        $data = $this->find($id);
+
+        if ($data instanceof ArticleEntity) {
+            $data->published = false;
+            $article         = ArticleDTO::fromArray($data->toArray());
+
+            return $this->update($id, $article);
         }
 
-        return new Article($response->toArray());
+        return collect(['status' => 404, 'error' => 'not found']);
     }
 
-    public function publish(int $id): Article|Collection
+    public function create(ArticleDTO $payload): ArticleEntity|Collection
     {
-        return $this->update($id, [
-            'published' => true,
-        ]);
-    }
+        $response = $this->request(HttpMethod::POST, '/articles', ['article' => $payload->toArray()]);
 
-    public function unpublish(int $id): Article|Collection
-    {
-        return $this->update($id, [
-            'published' => false,
-        ]);
-    }
-
-    public function published(): static
-    {
-        $this->return_published = '/published';
-
-        return $this;
-    }
-
-    public function unpublished(): static
-    {
-        $this->return_unpublished = '/unpublished';
-
-        return $this;
-    }
-
-    public function me(): static
-    {
-        $this->return_me = '/me';
-
-        return $this;
-    }
-
-    public function latest(): static
-    {
-        $this->return_latest = true;
-
-        return $this;
-    }
-
-    public function fromPage(int $page): static
-    {
-        $this->page = $page;
-
-        return $this;
-    }
-
-    public function from(string $name): static
-    {
-        $this->from = $name;
-
-        return $this;
-    }
-
-    public function withoutTags(array $tags): static
-    {
-        $this->tags_exclude = $tags;
-
-        return $this;
-    }
-
-    public function withTags(array $tags): static
-    {
-        $this->tags_include = $tags;
-
-        return $this;
-    }
-
-    public function perPage(int $per_page): static
-    {
-        $this->per_page = $per_page;
-
-        return $this;
-    }
-
-    public function update(int $id, array $payload): Article|Collection
-    {
-        $response = $this->service
-            ->api
-            ->put("/articles/{$id}", ['article' => $payload]);
-
-        $status   = $response->status();
-        $response = $response->collect();
-
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
         }
 
-        return new Article($response->toArray());
+        return new ArticleEntity($response->collect()->toArray());
     }
 
-    public function find(int $id): Article|Collection
+    public function update(int $id, ArticleDTO $payload): ArticleEntity|Collection
     {
-        $response = $this->service
-            ->api
-            ->get("/articles/{$id}");
+        $response = $this->request(HttpMethod::PUT, "/articles/{$id}", ['article' => $payload->toArray()]);
 
-        $status   = $response->status();
-        $response = $response->collect();
-
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
         }
 
-        return new Article($response->toArray());
+        return new ArticleEntity($response->collect()->toArray());
+    }
+
+    public function find(int $id): ArticleEntity|Collection
+    {
+        $response = $this->request(HttpMethod::GET, "/articles/{$id}");
+
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
+        }
+
+        return new ArticleEntity($response->collect()->toArray());
     }
 
     public function get(): Collection
     {
-        $getLatest = ($this->return_latest) ? '/latest' : '';
+        $uri = 'articles' . $this->buildUriWithQueryParams(self::URI_PATHS);
 
-        $getMe = $this->getMeUri();
+        $response = $this->request(HttpMethod::GET, $uri);
 
-        $uri = $this->makeUri("/articles{$getLatest}{$getMe}");
-
-        $response = $this->service
-            ->api
-            ->get($uri);
-
-        $status   = $response->status();
-        $response = $response->collect();
-
-        if ($status !== Response::HTTP_OK) {
-            return $response;
+        if ($response->status() !== Response::HTTP_OK) {
+            return $response->collect();
         }
 
-        return $this->transform($response, Article::class);
-    }
-
-    private function getMeUri(): ?string
-    {
-        if ($this->return_me) {
-            if ($this->return_published) {
-                return $this->return_me . $this->return_published;
-            }
-
-            if ($this->return_unpublished) {
-                return $this->return_me . $this->return_unpublished;
-            }
-
-            return $this->return_me . '/all';
-        }
-
-        return null;
-    }
-
-    private function makeUri(string $prefix = ''): string
-    {
-        $uri = "{$prefix}?";
-        $i   = 0;
-
-        $properties = [
-            'per_page'     => $this->per_page,
-            'tags'         => $this->tags_include,
-            'tags_exclude' => $this->tags_exclude,
-            'username'     => $this->from,
-            'page'         => $this->page,
-        ];
-
-        foreach ($properties as $key => $value) {
-            if (empty($value) || $value == "") {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $value = implode(',', $value);
-            }
-            $uri .= (($i !== 0) ? '&' : '') . "{$key}={$value}";
-
-            $i++;
-        }
-
-        return $uri;
+        return $this->transform($response->collect(), ArticleEntity::class);
     }
 }

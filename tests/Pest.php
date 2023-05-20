@@ -15,7 +15,7 @@ function articleFakeRequest($without_api_key = false)
     $singleArticle    = config('single_article_sample');
 
     Http::fake([
-        '/articles/me/unpublished?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
+        '/articles/me/unpublished' => function ($request) use ($multipleArticles, $without_api_key) {
             if (isWithoutCredentials($request, $without_api_key)) {
                 return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
             }
@@ -23,7 +23,7 @@ function articleFakeRequest($without_api_key = false)
             return Http::response([$multipleArticles[2]]);
         },
 
-        '/articles/me/published?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
+        '/articles/me/published' => function ($request) use ($multipleArticles, $without_api_key) {
             if (isWithoutCredentials($request, $without_api_key)) {
                 return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
             }
@@ -31,7 +31,7 @@ function articleFakeRequest($without_api_key = false)
             return Http::response([$multipleArticles[0], $multipleArticles[1]]);
         },
 
-        '/articles/me/all?per_page=30' => function ($request) use ($multipleArticles, $without_api_key) {
+        '/articles/me/all' => function ($request) use ($multipleArticles, $without_api_key) {
             if (isWithoutCredentials($request, $without_api_key)) {
                 return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
             }
@@ -58,7 +58,11 @@ function articleFakeRequest($without_api_key = false)
 
         '/articles/0' => Http::response(['error' => 'not found', 'status' => 404], Response::HTTP_NOT_FOUND),
 
-        '/articles' => function ($request) use ($singleArticle, $without_api_key) {
+        '/articles' => function ($request) use (
+            $singleArticle,
+            $multipleArticles,
+            $without_api_key
+        ) {
             if (isWithoutCredentials($request, $without_api_key)) {
                 return Http::response(['error' => 'unauthorized', 'status' => 401], Response::HTTP_UNAUTHORIZED);
             }
@@ -66,21 +70,21 @@ function articleFakeRequest($without_api_key = false)
             if ($request->method() == 'POST') {
                 return Http::response($singleArticle[2]);
             }
+
+            return Http::response($multipleArticles);
         },
 
-        '/articles?per_page=30' => Http::response($multipleArticles),
-
-        '/articles/latest?per_page=30' => Http::response($multipleArticles),
+        '/articles/latest' => Http::response($multipleArticles),
 
         '/articles?per_page=2' => Http::response([$multipleArticles[0], $multipleArticles[1]]),
 
-        '*&tags=discuss' => Http::response([$multipleArticles[0], $multipleArticles[2]]),
+        '*?tags=discuss' => Http::response([$multipleArticles[0], $multipleArticles[2]]),
 
-        '&tags_exclude=discuss' => Http::response([$multipleArticles[1]]),
+        '*?tags_exclude=discuss' => Http::response([$multipleArticles[1]]),
 
-        '&username=ben' => Http::response([$multipleArticles[1], $multipleArticles[2]]),
+        '*?username=ben' => Http::response([$multipleArticles[1], $multipleArticles[2]]),
 
-        '&page=2' => Http::response($multipleArticles),
+        '*?page=2' => Http::response($multipleArticles),
     ]);
 }
 

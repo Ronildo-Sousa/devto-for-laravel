@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace RonildoSousa\DevtoForLaravel;
 
-use RonildoSousa\DevtoForLaravel\Commands\DevtoForLaravelCommand;
 use Spatie\LaravelPackageTools\{Package, PackageServiceProvider};
 
 class DevtoForLaravelServiceProvider extends PackageServiceProvider
@@ -18,9 +17,6 @@ class DevtoForLaravelServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('devto-for-laravel')
-            ->hasConfigFile(['devto-for-laravel', 'articles_sample', 'single_article_sample'])
-            ->hasViews()
-            ->hasMigration('create_devto-for-laravel_table')
-            ->hasCommand(DevtoForLaravelCommand::class);
+            ->hasConfigFile(['devto-for-laravel', 'articles_sample', 'single_article_sample']);
     }
 }
